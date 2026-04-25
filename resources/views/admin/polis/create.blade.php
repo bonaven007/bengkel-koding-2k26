@@ -22,7 +22,7 @@
                 <div class="form-control mb-5">
                     <label class="label pb-1">
                         <span class="text-sm font-semibold text-gray-700">
-                            Nama Poli <span class="text-red-500">*</span>
+                            Keterangan
                         </span>
                     </label>
 
@@ -44,13 +44,13 @@
                 <div class="form-control mb-6">
                     <label class="label pb-1">
                         <span class="text-sm font-semibold text-gray-700">
-                            Keterangan <span class="text-red-500">*</span>
+                            Keterangan
                         </span>
                     </label>
 
                     <textarea name="keterangan" rows="4" placeholder="Masukkan keterangan poli..."
                         class="textarea textarea-bordered w-full rounded-lg text-sm resize-none @error('keterangan') textarea-error @enderror"
-                        required>{{ old('keterangan') }}</textarea>
+                        >{{ old('keterangan') }}</textarea>
 
                     @error('keterangan')
                     <label class="label pt-1">
