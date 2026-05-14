@@ -29,7 +29,7 @@ class PoliController extends Controller
     $request->validate([
     'id_poli' => 'required|exists:poli,id',
     'id_jadwal' => 'required|exists:jadwal_periksa,id',
-    'keluhan' => 'nullable:string',
+    'keluhan' => 'required|string',
     'id_pasien' => 'required|exists:users,id',
     ]);
 

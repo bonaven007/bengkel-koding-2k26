@@ -30,7 +30,7 @@ class PoliController extends Controller
 
     public function edit($id)
     {
-    $polis = Poli::findOrFail($id);
+    $poli = Poli::findOrFail($id);
     return view('admin.polis.edit', compact('poli'));
     }
 

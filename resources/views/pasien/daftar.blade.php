@@ -49,7 +49,7 @@
                                 Pilih Poli
                             </label>
 
-                            <select name="id_poli" id="poliSelect" class="w-full border-2 rounded-lg p-2">
+                            <select name="id_poli" id="poliSelect" class="w-full border-2 rounded-lg p-2" required>
                                 <option value="">-- Pilih Poli --</option>
                                 @foreach ($polis as $poli)
                                 <option value="{{ $poli->id }}">
@@ -66,7 +66,7 @@
                                 Pilih Jadwal Periksa
                             </label>
 
-                            <select name="id_jadwal" id="jadwalSelect" class="w-full border-2 rounded-lg p-2">
+                            <select name="id_jadwal" id="jadwalSelect" class="w-full border-2 rounded-lg p-2" required>
                                 <option value="">-- Pilih Jadwal --</option>
 
                                 @foreach ($jadwals as $jadwal)
@@ -86,7 +86,7 @@
                                 Keluhan
                             </label>
                             <textarea name="keluhan" rows="3" class="w-full border-2 rounded-lg p-2"
-                                placeholder="Tulis keluhan anda..."></textarea>
+                                placeholder="Tulis keluhan anda..." required></textarea>
                         </div>
 
                         <div class="flex justify-end">
@@ -106,25 +106,38 @@
     <script>
         document.addEventListener("DOMContentLoaded", function(){
 
-    const poliSelect = document.getElementById("poliSelect")
-    const jadwalSelect = document.getElementById("jadwalSelect")
-    const jadwalOptions = jadwalSelect.querySelectorAll("option")
+            const poliSelect = document.getElementById("poliSelect")
+            const jadwalSelect = document.getElementById("jadwalSelect")
+            const jadwalOptions = Array.from(jadwalSelect.options)
 
-    poliSelect.addEventListener("change", function(){
-        let poliId = this.value
-        jadwalOptions.forEach(option => {
-            if(option.value === ""){
-                option.style.display = "block"
-                return
+            const updateJadwalOptions = poliId => {
+                let hasVisibleSchedule = false
+
+                jadwalOptions.forEach(option => {
+                    if(option.value === ""){
+                        option.hidden = false
+                        option.disabled = false
+                        return
+                    }
+
+                    const optionPoli = (option.dataset.poli ?? "").toString().trim()
+                    const visible = poliId === "" || optionPoli === poliId.toString().trim()
+
+                    option.hidden = !visible
+                    option.disabled = !visible
+                    if(visible) hasVisibleSchedule = true
+                })
+
+                if(!hasVisibleSchedule){
+                    jadwalSelect.value = ""
+                }
             }
-            if(option.dataset.poli === poliId){
-                option.style.display = "block"
-            }else{
-                option.style.display = "none"
-            }
-        })
-        jadwalSelect.value = ""
-    })
+
+            poliSelect.addEventListener("change", function(){
+                updateJadwalOptions(this.value)
+                jadwalSelect.value = ""
+            })
+
         })
     </script>
     @endpush
