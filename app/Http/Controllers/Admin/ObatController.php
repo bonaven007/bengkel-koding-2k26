@@ -24,15 +24,15 @@ class ObatController extends Controller
     {
         $data = $request->validate([
             'nama_obat' => 'required|string|max:255',
-            'kemasan' => 'required|string|max:255',
-            'harga' => 'required|integer',
+            'kemasan' => 'nullable|string|max:255',
+            'harga' => 'required|integer|min:0',
+            'stok' => 'required|integer|min:0',
         ]);
 
         Obat::create($data);
 
         return redirect()->route('obat.index')
-            ->with('message', 'Data obat berhasil ditambahkan')
-            ->with('type', 'success');
+            ->with('success', 'Data obat berhasil ditambahkan');
     }
 
     public function edit(Obat $obat)
@@ -44,15 +44,30 @@ class ObatController extends Controller
     {
         $data = $request->validate([
             'nama_obat' => 'required|string|max:255',
-            'kemasan' => 'required|string|max:255',
-            'harga' => 'required|integer',
+            'kemasan' => 'nullable|string|max:255',
+            'harga' => 'required|integer|min:0',
+            'stok' => 'required|integer|min:0',
+            'add_stock' => 'nullable|integer|min:0',
+            'reduce_stock' => 'nullable|integer|min:0',
         ]);
+
+        $addStock = $data['add_stock'] ?? 0;
+        $reduceStock = $data['reduce_stock'] ?? 0;
+        $newStok = $data['stok'] + $addStock - $reduceStock;
+
+        if ($newStok < 0) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Pengurangan stok tidak boleh lebih besar dari stok tersedia.');
+        }
+
+        $data['stok'] = $newStok;
+        unset($data['add_stock'], $data['reduce_stock']);
 
         $obat->update($data);
 
         return redirect()->route('obat.index')
-            ->with('message', 'Data obat berhasil diupdate')
-            ->with('type', 'success');
+            ->with('success', 'Data obat berhasil diupdate');
     }
 
     public function destroy(Obat $obat)
@@ -60,7 +75,6 @@ class ObatController extends Controller
         $obat->delete();
 
         return redirect()->route('obat.index')
-            ->with('message', 'Data obat berhasil dihapus')
-            ->with('type', 'success');
+            ->with('success', 'Data obat berhasil dihapus');
     }
 }

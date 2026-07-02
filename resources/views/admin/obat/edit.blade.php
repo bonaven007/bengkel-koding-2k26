@@ -62,6 +62,48 @@
 
                 </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    {{-- Stok --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">
+                            Stok Saat Ini <span class="text-slate-500 font-normal">({{ $obat->stok }})</span>
+                        </label>
+                        <input type="number" name="stok" value="{{ old('stok', $obat->stok) }}" placeholder="0" min="0" step="1"
+                            class="w-full px-4 py-2 border-2 rounded-lg p-2 focus:border-primary focus:outline-none
+                                      @error('stok') border-red-500 @enderror" required>
+                        @error('stok')
+                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    {{-- Penyesuaian Stok --}}
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-1">
+                            Penyesuaian Stok
+                        </label>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <label class="block text-sm text-slate-600 mb-1">Tambah Stok</label>
+                                <input type="number" name="add_stock" value="{{ old('add_stock') }}" placeholder="0" min="0" step="1"
+                                    class="w-full px-4 py-2 border-2 rounded-lg p-2 focus:border-primary focus:outline-none
+                                              @error('add_stock') border-red-500 @enderror">
+                                @error('add_stock')
+                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-sm text-slate-600 mb-1">Kurangi Stok</label>
+                                <input type="number" name="reduce_stock" value="{{ old('reduce_stock') }}" placeholder="0" min="0" step="1"
+                                    class="w-full px-4 py-2 border-2 rounded-lg p-2 focus:border-primary focus:outline-none
+                                              @error('reduce_stock') border-red-500 @enderror">
+                                @error('reduce_stock')
+                                <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {{-- Harga --}}
                 <div class="mb-8">

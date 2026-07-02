@@ -13,6 +13,10 @@ return new class extends Migration
     {
         Schema::create('obat', function (Blueprint $table) {
             $table->id();
+            $table->string('nama_obat')->nullable();
+            $table->string('kemasan')->nullable();
+            $table->integer('harga')->default(0);
+            $table->integer('stok')->default(0);
             $table->timestamps();
         });
     }

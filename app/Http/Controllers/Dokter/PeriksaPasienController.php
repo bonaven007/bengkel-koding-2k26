@@ -7,6 +7,7 @@ use App\Models\Obat;
 use App\Models\Periksa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PeriksaPasienController extends Controller
 {
@@ -31,28 +32,44 @@ class PeriksaPasienController extends Controller
 
     public function store(Request $request)
     {
-    $request->validate([
-    'id_daftar_poli' => 'required|exists:daftar_poli,id',
-    'obat_json' => 'required',
-    'catatan' => 'nullable|string',
-    'biaya_periksa' => 'required|integer',
-    ]);
+        $request->validate([
+            'id_daftar_poli' => 'required|exists:daftar_poli,id',
+            'obat_json' => 'required',
+            'catatan' => 'nullable|string',
+            'biaya_periksa' => 'required|integer',
+        ]);
 
-    $obats = json_decode($request->obat_json, true);
+        $obatIds = json_decode($request->obat_json, true);
+        $obats = Obat::whereIn('id', $obatIds)->get()->keyBy('id');
 
-    $periksa = Periksa::create([
-    'id_daftar_poli' => $request->id_daftar_poli,
-    'tgl_periksa' => now(),
-    'catatan' => $request->catatan,
-    'biaya_periksa' => $request->biaya_periksa + 150000,
-    ]);
-    foreach ($obats as $idObat) {
-    DetailPeriksa::create([
-    'id_periksa' => $periksa->id,
-    'id_obat' => $idObat,
-    ]);
-    }
+        try {
+            DB::transaction(function () use ($request, $obatIds, $obats) {
+                foreach ($obatIds as $idObat) {
+                    if (!isset($obats[$idObat]) || $obats[$idObat]->stok <= 0) {
+                        throw new \RuntimeException('Stok obat tidak mencukupi atau obat tidak ditemukan.');
+                    }
+                }
 
-    return redirect()->route('periksa-pasien.index')->with('success', 'Data periksa berhasil disimpan.');
+                $periksa = Periksa::create([
+                    'id_daftar_poli' => $request->id_daftar_poli,
+                    'tgl_periksa' => now(),
+                    'catatan' => $request->catatan,
+                    'biaya_periksa' => $request->biaya_periksa + 150000,
+                ]);
+
+                foreach ($obatIds as $idObat) {
+                    DetailPeriksa::create([
+                        'id_periksa' => $periksa->id,
+                        'id_obat' => $idObat,
+                    ]);
+
+                    $obats[$idObat]->reduceStock();
+                }
+            });
+        } catch (\RuntimeException $exception) {
+            return redirect()->back()->with('error', $exception->getMessage());
+        }
+
+        return redirect()->route('periksa-pasien.index')->with('success', 'Data periksa berhasil disimpan dan stok obat diperbarui.');
     }
 }

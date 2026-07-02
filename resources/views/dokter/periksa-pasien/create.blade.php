@@ -20,6 +20,17 @@
                 @csrf
                 <input type="hidden" name="id_daftar_poli" value="{{ $id }}">
 
+                @if ($errors->any())
+                    <div class="alert alert-error mb-4 rounded-xl shadow-sm">
+                        <i class="fas fa-circle-xmark"></i>
+                        <ul class="list-disc pl-5 mt-2">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 {{-- Pilih Obat --}}
                 <div class="form-control mb-5">
                     <label class="label pb-1">
@@ -30,8 +41,10 @@
                         @foreach ($obats as $obat)
                             <option value="{{ $obat->id }}"
                                 data-nama="{{ $obat->nama_obat }}"
-                                data-harga="{{ $obat->harga }}">
-                                {{ $obat->nama_obat }} - Rp{{ number_format($obat->harga) }}
+                                data-harga="{{ $obat->harga }}"
+                                data-stok="{{ $obat->stok }}"
+                                {{ $obat->stok <= 0 ? 'disabled' : '' }}>
+                                {{ $obat->nama_obat }} - Rp{{ number_format($obat->harga) }} @if($obat->stok <= 0)(Stok Habis)@elseif($obat->stok <= 5)(Stok Menipis: {{ $obat->stok }})@else(Stok: {{ $obat->stok }})@endif
                             </option>
                         @endforeach
                     </select>
@@ -100,10 +113,11 @@
             const id = selectedOption.value;
             const nama = selectedOption.dataset.nama;
             const harga = parseInt(selectedOption.dataset.harga || 0);
+            const stok = parseInt(selectedOption.dataset.stok || 0);
 
-            if (!id || daftarObat.some(o => o.id == id)) return;
+            if (!id || daftarObat.some(o => o.id == id) || stok <= 0) return;
 
-            daftarObat.push({ id, nama, harga });
+            daftarObat.push({ id, nama, harga, stok });
             renderObat();
             selectObat.selectedIndex = 0;
         });

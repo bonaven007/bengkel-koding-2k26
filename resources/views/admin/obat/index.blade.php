@@ -27,6 +27,7 @@
                         <tr>
                             <th class="px-6 py-4">Nama Obat</th>
                             <th class="px-6 py-4">Kemasan</th>
+                            <th class="px-6 py-4">Stok</th>
                             <th class="px-6 py-4">Harga</th>
                             <th class="px-6 py-4 text-right">Aksi</th>
                         </tr>
@@ -46,6 +47,19 @@
                                              rounded-full bg-green-100 text-green-600">
                                     {{ $obat->kemasan ?? '-' }}
                                 </span>
+                            </td>
+
+                            <td class="px-6 py-4">
+                                <div class="flex flex-col gap-1">
+                                    <span class="font-semibold text-slate-800">{{ $obat->stok }}</span>
+                                    @if($obat->isOutOfStock())
+                                        <span class="inline-block px-2 py-1 text-[11px] font-semibold rounded-full bg-red-100 text-red-600">Habis</span>
+                                    @elseif($obat->isLowStock())
+                                        <span class="inline-block px-2 py-1 text-[11px] font-semibold rounded-full bg-yellow-100 text-yellow-700">Menipis</span>
+                                    @else
+                                        <span class="inline-block px-2 py-1 text-[11px] font-semibold rounded-full bg-green-100 text-green-600">Tersedia</span>
+                                    @endif
+                                </div>
                             </td>
 
                             <td class="px-6 py-4 font-semibold text-slate-800">
@@ -85,7 +99,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="text-center py-12 text-slate-400">
+                            <td colspan="5" class="text-center py-12 text-slate-400">
                                 <i class="fas fa-inbox text-3xl mb-3 block"></i>
                                 Belum ada data obat
                             </td>
